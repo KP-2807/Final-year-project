@@ -1,0 +1,92 @@
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(13, 12, 11,10 , 9, 8);
+const int hpin=A1,tpin=A0,empin=A4;
+#include <SoftwareSerial.h>
+#include <TinyGPS++.h>
+
+SoftwareSerial ss(A2,A3);
+float latt;
+float lang;
+String getStr;
+TinyGPSPlus gps;
+
+int h,t,count,hf,hcount,em;
+
+void setup() {
+Serial.begin(9600);
+ss.begin(9600);
+lcd.begin(16,2);
+lcd.clear();
+lcd.setCursor(0,0);
+lcd.print("WATER COMMN BASED");
+lcd.setCursor(0,1);
+lcd.print("HEALTHCARE SYSTEM");
+delay(3000);
+lcd.clear();
+pinMode(tpin,INPUT);
+pinMode(hpin,INPUT);
+pinMode(empin,INPUT);
+hf=analogRead(hpin);
+ss.begin(9600);
+for(int j=0;j<=100;j++)
+  {
+    ss.listen();
+    loc();
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Reading GPS");
+    lcd.setCursor(0,1);
+    lcd.print(getStr);
+Serial.println(String(j)+" Loc :"+ getStr);
+    delay(10);
+  }
+
+}
+
+void loop() {
+
+  loc();
+    lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Location:");
+  lcd.setCursor(0,1);
+  lcd.print(getStr);
+  delay(1000);
+t=analogRead(tpin)/2;
+h=analogRead(hpin);
+em=digitalRead(empin);
+//Serial.println(String(hf)+","+String(h));
+if(hcount > 20)
+{
+  hcount=0;
+}
+
+lcd.clear();
+lcd.setCursor(0,0);
+lcd.print("Temp:");
+lcd.print(t);
+lcd.setCursor(10,0);
+lcd.print("EM:");
+lcd.print(em);
+lcd.setCursor(0,1);
+lcd.print("Heartbeat:");
+lcd.print(h);
+delay(500);
+Serial.println("T:"+String(t)+",H:"+String(h)+",EM:"+String(em)+"-Loc:"+getStr);
+delay(1000);
+}
+
+
+void loc()
+{
+  while (ss.available() > 0){
+  gps.encode(ss.read());
+  if (gps.location.isUpdated()){
+  getStr = "";
+  getStr += String(gps.location.lat(), 4);
+  getStr += "N,";
+  getStr += String(gps.location.lng(), 4);
+  getStr += "E";
+    }
+  }
+  }

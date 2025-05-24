@@ -1,0 +1,39 @@
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(A0, A1, A2, A3, A4,A5);
+
+String rfid;
+
+void setup() {
+lcd.begin(16,2);
+lcd.clear();
+lcd.setCursor(0,0);
+lcd.print("WATER DATA");
+lcd.setCursor(0,1);
+lcd.print("  RECEIVER");
+delay(3000);
+Serial.begin(9600);
+}
+
+void loop() {
+  lcd.clear();
+  lcd.print("No Data REceived");
+     
+while(Serial.available() > 0)
+  {
+    rfid=Serial.readStringUntil('\n');
+    String url=rfid;
+   int aa=url.length();
+int c=url.indexOf('-');
+String d=url.substring(0,c);
+int e=c+1;
+String ee=url.substring(e,aa);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(d);
+    lcd.setCursor(0,1);
+    lcd.print(ee);
+Serial.println(d);
+Serial.println(ee);
+    delay(1000);
+  }
+}
